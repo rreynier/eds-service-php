@@ -52,7 +52,7 @@ $Mailer->send( $Message );
 ``` php
 <?php 
 $Mailer = new \Idexx\EdsServicePhp\Mailer( 'endpointUri', 'applicationKey', 'apiVersion' );
-$Mailer->get( $messageId );
+$Mailer->getMessage( $messageId );
 ```
 
 ## Use of custom loggers and response parsers
