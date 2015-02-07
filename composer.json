@@ -1,0 +1,27 @@
+{
+  "name": "idexx/eds-service-php",
+  "description": "Idexx EDS SDK for PHP",
+  "license": "GPL v3",
+  "authors": [
+    {
+      "name": "Kris Reeck",
+      "email": "kris@bythepixel.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "resty/resty": "0.6.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.4.5"
+  },
+  "autoload": {
+    "psr-0": {
+      "Idexx\\EdsServicePhp\\": "src/"
+    },
+    "classmap": [
+      "src/"
+    ]
+  },
+  "minimum-stability": "stable"
+}
