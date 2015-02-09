@@ -13,7 +13,7 @@ use Resty\Resty;
  * A simple transporter for IDEXX Email Delivery Service
  *
  * @package Idexx\EdsService
- * @link https://github.com/IDEXX/eds-service-php
+ * @link    https://github.com/IDEXX/eds-service-php
  */
 class Mailer
 {
@@ -75,7 +75,7 @@ class Mailer
 
         if ( $Message->isValidForDelivery() ) {
             return $this->getUpstreamParser(
-                $request->post( $this->getPostRoute(), $Message->toJson(), ['Content-Type' => 'application/json'] )
+                $request->post( $this->getPostRoute(), $Message->toJson(), [ 'Content-Type' => 'application/json' ] )
             );
         }
     }
@@ -168,9 +168,24 @@ class Mailer
     /**
      * reads the upstream response
      *
+     * Response contains the following structure
+     *      - meta array
+     *      - body stdClass
+     *          - messageId string
+     *          - status string ACCEPTED / REJECTED
+     *          - rejectionReason null|string
+     *      -error
+     *      -error_msg
+     *      -status int http response code
+     *      -headers array
+     *      -body_raw array
+     *          - messageId string
+     *          - status string ACCEPTED / REJECTED
+     *          - rejectionReason null|string
+     *
      * @param $response
      *
-     * @return string message identifier
+     * @return array
      * @throws MailServiceException
      */
     protected function parseUpstream( $response )
@@ -179,16 +194,11 @@ class Mailer
         $this->checkRequestErrors( $response );
 
         // read EDS response
-        if ( isset( $response['status'] ) && $response['status'] === 'REJECTED' ) {
-            throw new MailServiceException( "Message was rejected: [%s]", $response['rejectionReason'] );
+        if ( $response['body']->status !== 'ACCEPTED' ) {
+            throw new MailServiceException( $response['body']->rejectionReason );
         }
 
-        // return the messageId on success
-        if ( isset( $response['status'] ) && $response['status'] === 'ACCEPTED' ) {
-            return $response['messageId'];
-        }
-
-        throw new MailServiceException( 'Unexpected response returned' );
+        return $response;
     }
 
     /**
@@ -196,7 +206,7 @@ class Mailer
      *
      * @param $response
      *
-     * @return mixed
+     * @return array
      * @throws MailServiceException
      */
     protected function parseDownstream( $response )
@@ -219,11 +229,6 @@ class Mailer
      */
     private function checkRequestErrors( $response )
     {
-        // capture Resty errors
-        if ( isset( $response['error'] ) && (bool)$response['error'] ) {
-            throw new MailServiceException( sprintf( "Unable to transport mail [%s]", $response['error_msg'] ) );
-        }
-
         // detect 404s
         if ( isset( $response['status'] ) && $response['status'] === 404 ) {
             throw new MailServiceException( "Request not found. Check application key" );
