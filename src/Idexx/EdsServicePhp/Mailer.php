@@ -75,7 +75,7 @@ class Mailer
 
         if ( $Message->isValidForDelivery() ) {
             return $this->getUpstreamParser(
-                $request->post( $this->getPostRoute(), $Message->toJson() )
+                $request->post( $this->getPostRoute(), $Message->toJson(), ['Content-Type' => 'application/json'] )
             );
         }
     }
@@ -92,7 +92,7 @@ class Mailer
         $request = $this->setUpResty( $restyOptions );
 
         return $this->getDownstreamParser(
-            $request->get( $this->getRetrieveRoute( $messageId ) )
+            $request->get( $this->getRetrieveRoute( $messageId ), null, [ 'Content-Type' => 'application/json' ] )
         );
     }
 
