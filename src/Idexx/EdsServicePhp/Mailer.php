@@ -194,7 +194,7 @@ class Mailer
         $this->checkRequestErrors( $response );
 
         // read EDS response
-        if ( $response['body']->status !== 'ACCEPTED' ) {
+        if ( isset($response['body'] ) && $response['body']->status !== 'ACCEPTED' ) {
             throw new MailServiceException( $response['body']->rejectionReason );
         }
 
