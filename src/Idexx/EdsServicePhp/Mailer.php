@@ -229,6 +229,11 @@ class Mailer
      */
     private function checkRequestErrors( $response )
     {
+        // detect 500s
+        if ( isset( $response['status'] ) && $response['status'] === 500 ) {
+            throw new MailServiceException( "There was a problem with our request to EDS" );
+        }
+
         // detect 404s
         if ( isset( $response['status'] ) && $response['status'] === 404 ) {
             throw new MailServiceException( "Request not found. Check application key" );
